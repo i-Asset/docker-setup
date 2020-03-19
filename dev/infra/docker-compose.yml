@@ -1,0 +1,145 @@
+version: '3'
+
+services:
+  ##########################
+  #### MS Infrastructure ###
+  ##########################
+
+  config-server:
+    image: iassetplatform/config-server:latest
+    env_file:
+      - env_vars
+    ports:
+      - "8888:8888"
+    environment:
+      _JAVA_OPTIONS: -Xmx128m -Xms50m
+
+  service-discovery:
+    image: iassetplatform/service-discovery:latest
+    env_file:
+      - env_vars
+    ports:
+      - "8761:8761"
+    depends_on:
+      - config-server
+    environment:
+      _JAVA_OPTIONS: -Xmx128m -Xms50m
+
+  gateway-proxy:
+    image: iassetplatform/gateway-proxy:latest
+    env_file:
+      - env_vars
+    ports:
+      - "80:80"
+    depends_on:
+      - config-server
+      - service-discovery
+    environment:
+      _JAVA_OPTIONS: -Xmx128m -Xms50m
+
+  ##########################
+  ######## Keycloak ########
+  ##########################
+
+  keycloak:
+    build: ./keycloak
+    environment:
+      KEYCLOAK_LOGLEVEL: DEBUG
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: password
+      POSTGRES_DATABASE: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
+      POSTGRES_PORT_5432_TCP_ADDR: keycloak-db
+      PROXY_ADDRESS_FORWARDING: "true"
+      _JAVA_OPTIONS: -Xmx128m -Xms50m
+    command:
+      - "-b"
+      - "0.0.0.0"
+      - "-Dkeycloak.migration.action=import"
+      - "-Dkeycloak.migration.provider=dir"
+      - "-Dkeycloak.migration.dir=/migration/"
+      - "-Dkeycloak.migration.strategy=IGNORE_EXISTING"
+    ports:
+      - "8080:8080"
+      # - "9999:9999" # keycloak federation port - not used in local dev setup
+      - "8443:8443"
+    volumes:
+      - ./keycloak/init-migration/:/migration/
+    links:
+      - keycloak-db:postgres
+    depends_on:
+      - keycloak-db
+
+  keycloak-db:
+    image: postgres:10
+    volumes:
+      - keycloak_postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
+      POSTGRES_ROOT_PASSWORD: root_password
+
+  ##############################
+  ######## Apache Kafka ########
+  # ( for internal messaging ) #
+  ##############################
+
+  kafka:
+    build: ./kafka-docker # derived from https://github.com/wurstmeister/kafka-docker
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_CREATE_TOPICS: "test:1:1"
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      _JAVA_OPTIONS: -Xmx256m -Xms50m
+    depends_on:
+      - zookeeper
+
+  zookeeper:
+    image: zookeeper:3.4
+    ports:
+      - "2181:2181"
+
+  ##############################
+  ##### SMTP Email service #####
+  ##############################
+
+  maildev:
+    image: djfarrelly/maildev:0.14.0
+    ports:
+      - "8025:80"
+
+  solr:
+    image: solr:7.6.0
+    command: "-cloud"
+    ports:
+      - "8983:8983"
+    volumes:
+      - solr_data:/opt/solr/server/solr/
+    networks:
+      - infra
+
+  dev-main-db:
+    image: postgres:10
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - ./initdb/:/docker-entrypoint-initdb.d/
+      - dev-main-db:/var/lib/postgresql/data
+
+volumes:
+  keycloak_postgres_data:
+  solr_data:
+  dev-main-db:
+
+networks:
+  infra:
+    external:
+      name: iassetprod_default
