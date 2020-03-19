@@ -1,0 +1,283 @@
+version: '2'
+
+services:
+
+  ############################
+  ##### Identity Service #####
+  ############################
+
+  identity-service:
+    image: iassetplatform/identity-service:staging
+    env_file:
+      - env_vars
+    environment:
+      - _JAVA_OPTIONS=-Xmx128m -Xms50m # -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000
+      - POSTGRES_HOST=dev-main-db
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=identitydb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - BINARY_CONTENT_DB_HOST=dev-main-db
+      - BINARY_CONTENT_DB_PORT=5432
+      - BINARY_CONTENT_DB_NAME=binarycontentdb
+      - BINARY_CONTENT_DB_USERNAME=postgres
+      - BINARY_CONTENT_DB_PASSWORD=postgres
+      - BINARY_CONTENT_URL=http://not-yet-in-use/
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - KAFKA_JAAS_CONFIG=
+      - SMTP_HOST=maildev
+      - SMTP_PORT=25
+      - SMTP_DEFAULT_FROM=nimble@local-dev
+      - SMTP_USERNAME=
+      - SMTP_PASSWORD=
+      - SMTP_AUTH=false
+      - SMTP_STARTTLS=false
+      - KEYCLOAK_URL=http://keycloak:8080/auth
+#      - KEYCLOAK_URL=http://nimblewg.holonix.biz:8080/auth
+      - KEYCLOAK_REALM=master
+      - KEYCLOAK_ADMIN_USERNAME=admin
+      - KEYCLOAK_ADMIN_PASSWORD=password
+      - KEYCLOAK_ADMIN_CLIENT_ID=admin-cli
+      - CATALOG_SERVICE_OAUTH_CLIENT_ID=catalog-service-client
+      - CATALOG_SERVICE_OAUTH_SECRET=a0ea1248-084d-461b-ba19-52298c7ea680
+      - BP_SERVICE_OAUTH_CLIENT_ID=bp-service-client
+      - BP_SERVICE_OAUTH_SECRET=e497e7f3-d719-4e23-9f03-9cab09333f36
+      - KEYCLOAK_ADMIN_CLIENT_SECRET=cd2c2640-bca0-4d1d-9dab-b5705a17fbf8
+      - OAUTH_CLIENT_ID=nimble_client
+      - OAUTH_CLIENT_SECRET=cbcd2e6f-e58a-42b4-9d2d-95a933ee29ae
+      - OAUTH_CLIENT_ACCESSTOKEN_URI=http://keycloak:8080/auth/realms/master/protocol/openid-connect/token
+      - ROCKET_CHAT=false
+      - INDEXING_SERVICE_URL=http://indexing-service:8080/
+
+      #      - OAUTH_CLIENT_ACCESSTOKEN_URI=http://nimblewg.holonix.biz:8080/auth/realms/master/protocol/openid-connect/token
+      
+    ports:
+      - "9096:9096"
+      # - "8000:8000"
+    networks:
+      - infra
+      - identity-backend
+
+
+#  ##############################
+#  ## DataChannel Service      ##
+#  ##############################
+
+
+  datachannel-service:
+    image: iassetplatform/data-channel-service:staging
+    env_file:
+      - env_vars
+    environment:
+      - DATACHANNEL_DB_HOST=dev-main-db
+      - DATACHANNEL_DB_HOST_PORT=5432
+      - DATACHANNEL_DB_NAME=datachanneldb
+      - DATACHANNEL_DB_USERNAME=postgres
+      - DATACHANNEL_DB_PASSWORD=postgres
+      - IDENTITY_SERVICE_URL=http://identity-service:9096/
+      - LOCAL_DATA_PIPE=
+      - LOCAL_DCFS=
+      - DATA_PIPE_URL=
+      - DCFS_URL=
+    ports:
+        - "9099:9099"
+    networks:
+      - infra
+
+  ##############################
+  ## Business Process Service ##
+  ##############################
+
+  business-process-service:
+    image: iassetplatform/business-process-service:staging
+    env_file:
+      - env_vars
+    environment:
+      - BUSINESS_PROCESS_DB_HOST=dev-main-db
+      - BUSINESS_PROCESS_DB_PORT=5432
+      - BUSINESS_PROCESS_DB_NAME=businessprocessdb
+      - BUSINESS_PROCESS_DB_USERNAME=postgres
+      - BUSINESS_PROCESS_DB_PASSWORD=postgres
+      - UBL_DB_HOST=dev-main-db
+      - UBL_DB_HOST_PORT=5432
+      - UBL_DB_NAME=ubldb
+      - UBL_DB_USERNAME=postgres
+      - UBL_DB_PASSWORD=postgres
+      - CAMUNDA_DB_HOST=dev-main-db
+      - CAMUNDA_DB_PORT=5432
+      - CAMUNDA_DB_NAME=camundadb
+      - CAMUNDA_DB_USERNAME=postgres
+      - CAMUNDA_DB_PASSWORD=postgres
+      - BINARY_CONTENT_DB_HOST=dev-main-db
+      - BINARY_CONTENT_DB_PORT=5432
+      - BINARY_CONTENT_DB_NAME=binarycontentdb
+      - BINARY_CONTENT_DB_USERNAME=postgres
+      - BINARY_CONTENT_DB_PASSWORD=postgres
+      - BINARY_CONTENT_URL=http://not-yet-in-use/
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - KAFKA_JAAS_CONFIG=
+      - _JAVA_OPTIONS=-Xmx512m -Xms50m
+      - SMTP_HOST=maildev
+      - SMTP_PORT=25
+      - SMTP_DEFAULT_FROM=nimble@local-dev
+      - SMTP_USERNAME=
+      - SMTP_PASSWORD=
+      - SMTP_AUTH=false
+      - SMTP_STARTTLS=false
+      - BP_SERVICE_OAUTH_CLIENT_ID=bp-service-client
+      - BP_SERVICE_OAUTH_SECRET=e497e7f3-d719-4e23-9f03-9cab09333f36
+      - IDENTITY_SERVICE_URL=http://identity-service:9096/
+      - TRUST_SERVICE_URL=http://trust-service:9098/
+
+    mem_limit: 2000m
+    ports:
+      - "8085:8085"
+    networks:
+      - infra
+      - business-process-backend
+
+  ##############################
+  ####### Catalog Service ######  
+  ##############################
+
+  catalog-service:
+    image: iassetplatform/catalogue-service-micro:staging
+    # image: nimbleplatform/catalogue-service:latest
+    ports:
+      - "10095:8095"
+    env_file:
+      - env_vars
+    networks:
+      - infra
+      - catalog-backend
+    environment:
+      - _JAVA_OPTIONS=-Xmx256m -Xms50m
+      - UBL_DB_HOST=dev-main-db
+      - UBL_DB_HOST_PORT=5432
+      - UBL_DB_NAME=ubldb
+      - UBL_DB_USERNAME=postgres
+      - UBL_DB_PASSWORD=postgres
+      - CATEGORY_DB_HOST=dev-main-db
+      - CATEGORY_DB_PORT=5432
+      - CATEGORY_DB_NAME=categorydb
+      - CATEGORY_DB_USERNAME=postgres
+      - CATEGORY_DB_PASSWORD=postgres
+      - SYNC_DB_HOST=dev-main-db
+      - SYNC_DB_PORT=5432
+      - SYNC_DB_NAME=syncdb
+      - SYNC_DB_USERNAME=postgres
+      - SYNC_DB_PASSWORD=postgres
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - KAFKA_JAAS_CONFIG=
+      - BINARY_CONTENT_DB_HOST=dev-main-db
+      - BINARY_CONTENT_DB_PORT=5432
+      - BINARY_CONTENT_DB_NAME=binarycontentdb
+      - BINARY_CONTENT_DB_USERNAME=postgres
+      - BINARY_CONTENT_DB_PASSWORD=postgres
+      - BINARY_CONTENT_URL=http://not-yet-in-use/
+      - INDEXING_SERVICE_SOLR_URL=http://solr:8983/solr/
+      - IDENTITY_SERVICE_URL=http://identity-service:9096/
+      - INDEXING_SERVICE_URL=http://indexing-service:8080/
+      - INDEXING_SERVICE_SOLR_USERNAME=
+      - INDEXING_SERVICE_SOLR_PASSWORD=
+      - INDEXING_SYNC=true
+      - CATALOG_SERVICE_OAUTH_CLIENT_ID=catalog-service-client
+      - CATALOG_SERVICE_OAUTH_SECRET=a0ea1248-084d-461b-ba19-52298c7ea680
+      - OAUTH_CLIENT_ACCESSTOKEN_URI=
+
+  ###############################
+  ###### Frontend Service #######
+  ###############################
+
+  frontend-service:
+    image: iassetplatform/frontend-service:dev
+    environment:
+      TARGET_ENVIRONMENT: dev
+    ports:
+      - "8081:8080" # external port: 8081
+    env_file:
+      - env_vars
+    depends_on:
+      - frontend-service-sidecar
+    networks:
+      - infra
+
+  frontend-service-sidecar:
+    image: iassetplatform/sidecar:latest
+    ports:
+      - "9097:9097"
+    env_file:
+      - env_vars
+    environment:
+      SIDECAR_NAME: frontend-service
+      SIDECAR_APP_HOST: frontend-service
+      SIDECAR_APP_PORT: 8080 # use internal port of network (not publicly exposed)
+      SIDECAR_APP_HEALTH_URI: http://frontend-service:8080/health.json
+      SIDECAR_APP_HOMEPAGE_URI: http://frontend-service:8080/
+      _JAVA_OPTIONS: -Xmx128m -Xms128m
+    networks:
+      - infra
+
+  ###############################
+  ######## Trust Service ########
+  ###############################
+
+  trust-service:
+    image: iassetplatform/trust-service:staging
+    env_file:
+      - env_vars
+    environment:
+      - PORT=9098
+      - _JAVA_OPTIONS=-Xmx128m -Xms128m
+      - TRUST_DB_HOST=dev-main-db
+      - TRUST_DB_NAME=trustdb
+      - TRUST_DB_USERNAME=postgres
+      - TRUST_DB_PASSWORD=postgres
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - KAFKA_JAAS_CONFIG=
+    mem_limit: 800m
+    ports:
+      - "9098:9098"
+    networks:
+      - infra
+
+  ##############################
+  ####### Indexing Service #####
+  ##############################
+
+  indexing-service:
+    image: iassetplatform/indexing-service:staging
+    ports:
+      - "9101:8080"
+    environment:
+      - _JAVA_OPTIONS=-Xmx256m -Xms50m
+      - SOLR_HOST=http://solr:8983/solr/
+    mem_limit: 2000m
+    env_file:
+      - env_vars
+    networks:
+     - infra
+
+  ###############################
+  ## Data Aggregation Service ###
+  ###############################
+
+  data-aggregation-service:
+    image: iassetplatform/data-aggregation-service:staging
+    restart: always
+    environment:
+      - IDENTITY_SERVICE_URL=http://identity-service:9096/
+      - BUSINESS_PROCESS_SERVICE_URL=http://business-process-service:8085/
+      - CATALOGUE_SERVICE_URL=http://catalog-service:10095/
+      - _JAVA_OPTIONS=-Xmx256m -Xms50m
+    mem_limit: 1000m
+    networks:
+      - infra
+
+networks:
+  infra:
+    external:
+      name: iassetprod_default
+  identity-backend:
+  catalog-backend:
+  business-process-backend:
