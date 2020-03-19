@@ -1,0 +1,71 @@
+{
+  "realm" : "master",
+  "users" : [ {
+    "id" : "ea11f3f5-464b-4072-ab39-6553765ea683",
+    "createdTimestamp" : 1547642933589,
+    "username" : "admin",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : true,
+    "firstName" : "Ayeshmantha",
+    "lastName" : "Perera",
+    "email" : "test@test.com",
+    "credentials" : [ {
+      "type" : "password",
+      "hashedSaltedValue" : "6IjWeh4NicM5Tf+uEAlsDOifD/AyUqOJqwI/pe7hCrc/GWi5cdi1j4FqIv02hQGyYo/wFvWHfuQHlQRutlRLJQ==",
+      "salt" : "7aLKpydCIcXdu562kM1ZQQ==",
+      "hashIterations" : 27500,
+      "counter" : 0,
+      "algorithm" : "pbkdf2-sha256",
+      "digits" : 0,
+      "period" : 0,
+      "config" : { }
+    } ],
+    "disableableCredentialTypes" : [ "password" ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "uma_authorization", "offline_access", "admin" ],
+    "clientRoles" : {
+      "account" : [ "view-profile", "manage-account" ]
+    },
+    "notBefore" : 0,
+    "groups" : [ ]
+  }, {
+    "id" : "bbf6ea52-63f8-4632-b706-57dae21ee809",
+    "createdTimestamp" : 1547644843470,
+    "username" : "service-account-admin-cli",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : false,
+    "email" : "service-account-admin-cli@placeholder.org",
+    "serviceAccountClientId" : "admin-cli",
+    "credentials" : [ ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "uma_authorization", "offline_access" ],
+    "clientRoles" : {
+      "admin-cli" : [ "uma_protection" ],
+      "account" : [ "view-profile", "manage-account" ]
+    },
+    "notBefore" : 0,
+    "groups" : [ ]
+  }, {
+    "id" : "37e91170-1d0a-4f67-91eb-173761420b09",
+    "createdTimestamp" : 1547643065235,
+    "username" : "service-account-nimble_client",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : false,
+    "email" : "service-account-nimble_client@placeholder.org",
+    "serviceAccountClientId" : "nimble_client",
+    "credentials" : [ ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "uma_authorization", "offline_access" ],
+    "clientRoles" : {
+      "account" : [ "view-profile", "manage-account" ],
+      "nimble_client" : [ "uma_protection" ]
+    },
+    "notBefore" : 0,
+    "groups" : [ ]
+  } ]
+}
