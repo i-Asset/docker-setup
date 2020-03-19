@@ -1,0 +1,61 @@
+version: '3'
+
+services:
+  ##########################
+  #### MS Infrastructure ###
+  ##########################
+
+  config-server:
+    image: iassetplatform/config-server:latest
+    env_file:
+      - env_vars
+    environment:
+      - _JAVA_OPTIONS=-Xmx256m -Xms50m
+    ports:
+      - "8888:8888"
+
+  service-discovery:
+    image: iassetplatform/service-discovery:latest
+    env_file:
+      - env_vars
+    environment:
+      - _JAVA_OPTIONS=-Xmx256m -Xms50m
+    ports:
+      - "8761:8761"
+    depends_on:
+      - config-server
+
+  gateway-proxy:
+    image: iassetplatform/gateway-proxy:latest
+    env_file:
+      - env_vars
+    environment:
+      - _JAVA_OPTIONS=-Xmx256m -Xms50m
+#    ports:
+#      - "80:80"
+    depends_on:
+      - config-server
+      - service-discovery
+
+  ##########################
+  ######## Databases #######
+  ##########################
+
+  staging-main-db:
+    image: postgres:10
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: '*********'
+    command:
+      - "-c"
+      - "shared_buffers=300MB"
+      - "-c"
+      - "max_connections=375"
+    ports:
+      - 5432:5432
+    volumes:
+      - staging-main-db:/var/lib/postgresql/data
+
+volumes:
+  staging-main-db:
