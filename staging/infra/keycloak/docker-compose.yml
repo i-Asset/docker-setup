@@ -1,0 +1,22 @@
+version: '2'
+
+services:
+  keycloak:
+     image: jboss/keycloak:3.4.0.Final
+     env_file:
+       - keycloak_default_env
+       - keycloak_secrets
+     environment:
+       - PROXY_ADDRESS_FORWARDING=true
+       - _JAVA_OPTIONS=-Xmx256m -Xms50m
+     ports:
+       - "8080:8080"
+       - "10098:9990"
+       - "10099:8443"
+     networks:
+       - iasset-cloud-infra
+
+networks:
+  iasset-cloud-infra:
+    external:
+      name: iassetinfrastaging_default
