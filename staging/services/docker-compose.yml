@@ -266,7 +266,7 @@ services:
   ###############################
 
   distribution-network:
-    image: iassetplatform/distribution-network:v0.1
+    image: iassetplatform/distribution-network:staging
     depends_on:
       - zoo1
       - zoo2
