@@ -279,7 +279,7 @@ services:
   ###############################
 
   distribution-network:
-    image: iassetplatform/distribution-network:v0.1
+    image: iassetplatform/distribution-network:latest
     depends_on:
       - zoo1
       - zoo2
@@ -288,7 +288,7 @@ services:
       - kafka2
       - kafka3
     environment:
-      IASSET_SERVER: ${DOCKER_HOST_IP:-127.0.0.1}
+      IASSET_SERVER: ${DOCKER_HOST_IP:-https://iasset.salzburgresearch.at}
       SQLALCHEMY_DATABASE_URI: postgresql+psycopg2://postgres:postgres@${DOCKER_HOST_IP:-127.0.0.1}:5432/distributionnetworkdb
       KAFKA_BOOTSTRAP_SERVER: ${DOCKER_HOST_IP:-127.0.0.1}:9092,${DOCKER_HOST_IP:-127.0.0.1}:9093,${DOCKER_HOST_IP:-127.0.0.1}:9094
     network_mode: host
