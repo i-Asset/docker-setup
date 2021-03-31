@@ -279,7 +279,7 @@ services:
   ###############################
 
   distribution-network:
-    image: iassetplatform/distribution-network:latest
+    image: iassetplatform/distribution-network:staging
     depends_on:
       - zoo1
       - zoo2
@@ -287,11 +287,16 @@ services:
       - kafka1
       - kafka2
       - kafka3
+    # Staging deployment: (on Dockerhub and Jenkins), copy from iasset/distribution-network
     environment:
-      IASSET_SERVER: ${DOCKER_HOST_IP:-https://iasset.salzburgresearch.at}
-      SQLALCHEMY_DATABASE_URI: postgresql+psycopg2://{BINARY_CONTENT_DB_USERNAME}:{BINARY_CONTENT_DB_PASSWORD}@${DOCKER_HOST_IP:-127.0.0.1}:5432/distributionnetworkdb
-      KAFKA_BOOTSTRAP_SERVER: ${DOCKER_HOST_IP:-127.0.0.1}:9092,${DOCKER_HOST_IP:-127.0.0.1}:9093,${DOCKER_HOST_IP:-127.0.0.1}:9094
-    network_mode: host
+      IASSET_SERVER: https://iasset.salzburgresearch.at
+      SQLALCHEMY_DATABASE_URI: postgresql+psycopg2://${BINARY_CONTENT_DB_USERNAME}:${BINARY_CONTENT_DB_PASSWORD}@staging-main-db:${BINARY_CONTENT_DB_PORT:-5432}/distributionnetworkdb
+      KAFKA_BOOTSTRAP_SERVER: kafka1:19092,kafka2:19093,kafka3:19094
+    ports:
+      - "1908:1908"
+#    network_mode: host
+    networks:
+      - infra
     restart: always
 
   zoo1:
@@ -303,6 +308,8 @@ services:
       ZOO_MY_ID: 1
       ZOO_PORT: 2181
       ZOO_SERVERS: server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888
+    networks:
+      - infra
 
   zoo2:
     image: zookeeper:3.4.9
@@ -313,6 +320,8 @@ services:
       ZOO_MY_ID: 2
       ZOO_PORT: 2182
       ZOO_SERVERS: server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888
+    networks:
+      - infra
 
   zoo3:
     image: zookeeper:3.4.9
@@ -323,6 +332,8 @@ services:
       ZOO_MY_ID: 3
       ZOO_PORT: 2183
       ZOO_SERVERS: server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888
+    networks:
+      - infra
 
   kafka1:
     image: confluentinc/cp-kafka:6.1.0
@@ -340,6 +351,8 @@ services:
       - zoo1
       - zoo2
       - zoo3
+    networks:
+      - infra
 
   kafka2:
     image: confluentinc/cp-kafka:6.1.0
@@ -357,6 +370,8 @@ services:
       - zoo1
       - zoo2
       - zoo3
+    networks:
+      - infra
 
   kafka3:
     image: confluentinc/cp-kafka:6.1.0
@@ -374,7 +389,8 @@ services:
       - zoo1
       - zoo2
       - zoo3
-
+    networks:
+      - infra
 
 networks:
   infra:
