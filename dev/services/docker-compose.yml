@@ -292,6 +292,8 @@ services:
       - env_vars-staging
     ports:
       - "1908:1908"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - infra
     restart: always
