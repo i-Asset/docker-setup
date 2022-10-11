@@ -326,7 +326,7 @@ services:
     image: confluentinc/cp-kafka:6.1.0
     hostname: kafka1
     ports:
-      - "9092:9092"
+      - "9092:19092"
     environment:
       KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka1:19092,LISTENER_DOCKER_EXTERNAL://iasset.salzburgresearch.at:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
@@ -345,7 +345,7 @@ services:
     image: confluentinc/cp-kafka:6.1.0
     hostname: kafka2
     ports:
-      - "9093:9093"
+      - "9093:19093"
     environment:
       KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka2:19093,LISTENER_DOCKER_EXTERNAL://iasset.salzburgresearch.at:9093
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
@@ -364,7 +364,7 @@ services:
     image: confluentinc/cp-kafka:6.1.0
     hostname: kafka3
     ports:
-      - "9094:9094"
+      - "9094:19094"
     environment:
       KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka3:19094,LISTENER_DOCKER_EXTERNAL://iasset.salzburgresearch.at:9094
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
