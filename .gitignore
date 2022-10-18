@@ -7,3 +7,7 @@ prod/infra/keycloak/keycloak_secrets
 .vscode
 .idea
 dev/infra/data
+
+staging/services/env_vars
+staging/services/env_vars-staging
+staging/services/env_vars_delegate

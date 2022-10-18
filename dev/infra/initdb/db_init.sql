@@ -9,4 +9,5 @@ CREATE DATABASE datachanneldb WITH OWNER postgres;
 CREATE DATABASE trustdb WITH OWNER postgres;
 CREATE DATABASE keycloak WITH OWNER postgres;
 CREATE DATABASE binarycontentdb WITH OWNER postgres;
+CREATE DATABASE distributionnetworkdb WITH OWNER postgres;
 -- CREATE DATABASE datapipesdb WITH OWNER postgres;
