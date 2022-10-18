@@ -5,8 +5,8 @@ services:
   mongo:
     image: mongo:4
     restart: always
-    ports:
-      - 27017:27017
+    #ports:
+    #  - 27017:27017
     env_file:
       - mongo_secrets
     networks:
