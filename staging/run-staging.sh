@@ -20,6 +20,10 @@ elif [[ "$1" = "solr" ]]; then
 
 	docker-compose -f infra/solr/docker-compose.yml --project-name ${INFRA_PROJECT} up -d
 
+elif [[ "$1" = "mongo" ]]; then
+
+	docker-compose -f infra/mongo/docker-compose.yml --project-name ${INFRA_PROJECT} up -d
+
 elif [[ "$1" = "elk" ]]; then
 
 	docker-compose -f infra/elk/docker-compose-elk.yml --project-name ${INFRA_PROJECT} up --build -d
