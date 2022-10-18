@@ -20,7 +20,7 @@ services:
       - platform-config
     networks:
       - infra
-  
+
   ############################
   ##### Registry Service #####
   ############################
@@ -42,7 +42,7 @@ services:
   ############################
   ##### Identity Service #####
   ############################
- 
+
   identity-service:
     image: iassetplatform/identity-service:staging
     env_file:
@@ -95,9 +95,9 @@ services:
       - infra
 
   ##############################
-  ####### Catalog Service ######  
+  ####### Catalog Service ######
   ##############################
-  
+
   catalog-service-srdc:
     image: iassetplatform/catalogue-service-micro:staging
     ports:
@@ -115,7 +115,7 @@ services:
   ###############################
   ###### Frontend Service #######
   ###############################
-  
+
   frontend-service:
     image: iassetplatform/frontend-service:staging
     ports:
@@ -131,7 +131,7 @@ services:
       - infra
     depends_on:
       - frontend-service-sidecar
-  
+
   frontend-service-sidecar:
     image: nimbleplatform/sidecar:latest
     ports:
@@ -150,7 +150,7 @@ services:
     mem_limit: 1000m
     networks:
       - infra
- 
+
   ###############################
   #### Data Channel Service #####
   ###############################
@@ -276,7 +276,9 @@ services:
       - kafka3
     # Staging deployment: (on Dockerhub and Jenkins), copy from iasset/distribution-network
     env_file:
+      - env_vars
       - env_vars-staging
+      - platform-config
     ports:
       - "1908:1908"
     volumes:
@@ -296,6 +298,7 @@ services:
       ZOO_SERVERS: server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888
     networks:
       - infra
+    restart: always
 
   zoo2:
     image: zookeeper:3.4.9
@@ -308,6 +311,7 @@ services:
       ZOO_SERVERS: server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888
     networks:
       - infra
+    restart: always
 
   zoo3:
     image: zookeeper:3.4.9
@@ -320,6 +324,7 @@ services:
       ZOO_SERVERS: server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888
     networks:
       - infra
+    restart: always
 
 
   kafka1:
@@ -340,6 +345,7 @@ services:
       - zoo3
     networks:
       - infra
+    restart: always
 
   kafka2:
     image: confluentinc/cp-kafka:6.1.0
@@ -359,6 +365,7 @@ services:
       - zoo3
     networks:
       - infra
+    restart: always
 
   kafka3:
     image: confluentinc/cp-kafka:6.1.0
@@ -378,8 +385,10 @@ services:
       - zoo3
     networks:
       - infra
+    restart: always
 
 networks:
   infra:
     external:
       name: iassetinfrastaging_default
+
