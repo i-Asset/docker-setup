@@ -387,6 +387,17 @@ services:
       - infra
     restart: always
 
+  asset-repository-service:
+    image: iassetplatform/asset-repository-service:staging
+    environment:
+      _JAVA_OPTIONS: -Xmx256m -Xms128m
+    mem_limit: 1000m
+    env_file:
+      - env_vars
+      - env_vars-staging
+    networks:
+      - infra
+
 networks:
   infra:
     external:
